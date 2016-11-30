@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:cache="http://www.springframework.org/schema/cache" xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+    http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+    http://www.springframework.org/schema/cache
+    http://www.springframework.org/schema/cache/spring-cache.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd"
+        >
+<!-- spring task pool 自动扫描包 ,将带有注解的类 纳入spring容器管理-->
+       <context:component-scan base-package="com.huashitu"/>
+       <task:executor id="executor" pool-size="5" />
+       <task:scheduler id="scheduler" pool-size="10" />
+       <task:annotation-driven executor="executor" scheduler="scheduler" />
+
+       <!-- 引入配置文件 -->
+       <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+              <property name="locations">
+                     <list>
+                            <value>classpath*:applicationContext.properties</value>
+                     </list>
+              </property>
+       </bean>
+       <!-- 连接池-->
+       <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+              <property name="driverClassName" value="${jdbc.driverClass}"/>
+              <property name="url" value="${jdbc.url}"/>
+              <property name="username" value="${jdbc.user}"/>
+              <property name="password" value="${jdbc.password}"/>
+
+              <property name="initialSize" value="0" />
+              <property name="maxActive" value="20" />
+              <!-- <property name="maxIdle" value="20" /> 使用task 忽略这个-->
+              <property name="minIdle" value="0" />
+              <property name="maxWait" value="60000" />
+
+              <property name="validationQuery" value="${validationQuery}" />
+              <property name="testWhileIdle" value="true"/>
+              <property name="testOnBorrow" value="false"/>
+              <property name="testOnReturn" value="false"/>
+              <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+              <property name="timeBetweenEvictionRunsMillis" value="60000" />
+              <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+              <property name="minEvictableIdleTimeMillis" value="3600000" />
+              <!--超过时间限制，回收没有用(废弃)的连接（默认为 300秒，调整为180）-->
+              <property name="removeAbandoned" value="true" />
+              <property name="removeAbandonedTimeout" value="180" />
+              <!--回收后是否打印日志-->
+              <property name="logAbandoned" value="false" />
+              <!-- 配置监控统计拦截的filters -->
+              <property name="filters" value="stat"/>
+              <!-- 不建议开启，开启后性能没有关闭后好-->
+              <property name="poolPreparedStatements" value="false"/>
+              <property name="maxPoolPreparedStatementPerConnectionSize" value="20"/>
+       </bean>
+
+       <!-- mybatis文件配置，扫描所有mapper文件 -->
+       <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" p:dataSource-ref="dataSource"
+             p:configLocation="classpath:mybatis-config.xml"
+             p:mapperLocations="classpath:mapper/liveRadioMapper/*Mapper.xml"
+            />
+
+
+      <!-- <bean class="tk.mybatis.spring.mapper.MapperScannerConfigurer">
+              <property name="basePackage" value="com.shxm.mapper"/>
+              <property name="markerInterface" value="com.shxm.util.BaseMapper"/>
+       </bean>-->
+       <!-- spring与tk-mybatis整合配置，扫描所有dao -->
+       <bean class="tk.mybatis.spring.mapper.MapperScannerConfigurer"
+             p:basePackage="com.huashitu.mapper"
+             p:markerInterface="com.huashitu.util.BaseMapper"
+             p:sqlSessionFactoryBeanName="sqlSessionFactory"/>
+
+       <!-- 对dataSource 数据源进行事务管理 -->
+       <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+             p:dataSource-ref="dataSource"/>
+
+       <tx:advice id="txAdvice" transaction-manager="transactionManager">
+              <tx:attributes>
+                     <!-- 对insert,update,delete 开头的方法进行事务管理,只要有异常就回滚 -->
+                     <tx:method name="insert*" propagation="REQUIRED" rollback-for="java.lang.Throwable"/>
+                     <tx:method name="update*" propagation="REQUIRED" rollback-for="java.lang.Throwable"/>
+                     <tx:method name="delete*" propagation="REQUIRED" rollback-for="java.lang.Throwable"/>
+                     <tx:method name="upload*" propagation="REQUIRED" rollback-for="java.lang.Throwable"/>
+                     <tx:method name="select*" read-only="true"/>
+                     <tx:method name="find*" read-only="true"/>
+                     <tx:method name="get*" read-only="true"/>
+                     <tx:method name="*"/>
+              </tx:attributes>
+       </tx:advice>
+
+       <!-- aop 配置 -->
+       <aop:config>
+              <aop:pointcut id="serviceMethods" expression="execution(* com.huashitu.service..*(..))"/>
+              <aop:advisor advice-ref="txAdvice" pointcut-ref="serviceMethods"/>
+       </aop:config>
+
+       <!-- 配置使Spring采用CGLIB代理 -->
+       <aop:aspectj-autoproxy proxy-target-class="true"/>
+       <!-- 启用对事务注解的支持 -->
+       <tx:annotation-driven transaction-manager="transactionManager"/>
+
+</beans>

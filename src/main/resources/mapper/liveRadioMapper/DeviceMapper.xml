@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huashitu.mapper.DeviceMapper">
+    <resultMap id="BaseResultMap" type="com.huashitu.domain.Device">
+        <!--
+          WARNING - @mbggenerated
+        -->
+        <id column="id" javaType="java.lang.Long" jdbcType="BIGINT" property="id"/>
+        <id column="user_id" javaType="java.lang.Long" jdbcType="BIGINT" property="userId"/>
+        <id column="front_type" javaType="java.lang.String" jdbcType="CHAR" property="frontType"/>
+        <id column="device_token" javaType="java.lang.String" jdbcType="VARCHAR" property="deviceToken"/>
+        <id column="update_time" javaType="java.util.Date" jdbcType="TIMESTAMP" property="updateTime"/>
+        <id column="delete_flag" javaType="java.lang.Integer" jdbcType="INTEGER" property="deleteFlag"/>
+        <id column="is_receive" javaType="java.lang.Integer" jdbcType="INTEGER" property="isReceive"/>
+        <id column="create_time" javaType="java.util.Date" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+    <sql id="base_colum">
+    id,user_id,front_type,device_token,update_time,delete_flag,is_receive,create_time
+  </sql>
+    <insert id="saveOrUpdateDevice" parameterType="com.huashitu.domain.Device">
+        <selectKey keyProperty="count" resultType="java.lang.Integer" order="BEFORE" >
+            SELECT count(1) AS count FROM device where user_id=#{userId}
+        </selectKey>
+        <if test="count==0">
+            INSERT INTO device (user_id,front_type,device_token,delete_flag,is_receive,create_time
+            )
+            VALUES (#{userId},#{frontType},#{deviceToken},#{deleteFlag},#{isReceive},#{createTime})
+        </if>
+        <if test="count>0">
+            UPDATE device
+            set device_token = #{deviceToken},
+            front_type =#{frontType} ,
+            update_time =#{updateTime} ,
+            is_receive=#{isReceive}
+            where user_id = #{userId}
+        </if>
+    </insert>
+
+    <update id="updateDeviceByUserId" parameterType="com.huashitu.domain.Device">
+          UPDATE device
+          SET device_token = #{deviceToken},
+          front_type =#{frontType} ,
+          update_time =#{updateTime} ,
+          is_receive=#{isReceive}
+          WHERE user_id = #{userId}
+    </update>
+
+
+    <select id="isExistDeviceByUserId" resultType="java.lang.Integer">
+        SELECT  COUNT(1) FROM device  WHERE user_id=#{userId} and delete_flag=1
+    </select>
+
+</mapper>

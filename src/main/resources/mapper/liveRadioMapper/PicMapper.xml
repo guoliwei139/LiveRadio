@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huashitu.mapper.PicMapper">
+  <resultMap id="BaseResultMap" type="com.huashitu.domain.Pic">
+    <!--
+      WARNING - @mbggenerated
+    -->
+      <id column="id" javaType="java.lang.Long" jdbcType="BIGINT" property="id"/>
+      <id column="path" javaType="java.lang.String" jdbcType="VARCHAR" property="path"/>
+      <id column="pic_name" javaType="java.lang.String" jdbcType="VARCHAR" property="picName"/>
+      <id column="create_time" javaType="java.util.Date" jdbcType="TIMESTAMP" property="createTime"/>
+      <id column="delete_flag" javaType="java.lang.Integer" jdbcType="INTEGER" property="deleteFlag"/>
+  </resultMap>
+
+
+  <sql id="base_colum">
+    id，path,pic_name,create_time,delete_flag
+  </sql>
+
+  <insert id="insertPic" parameterType="com.huashitu.domain.Pic">
+    INSERT INTO  pic (path,pic_name,create_time,delete_flag) VALUES (#{path},#{picName},#{createTime},#{deleteFlag})
+    <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+      SELECT LAST_INSERT_ID() AS id
+    </selectKey>
+  </insert>
+
+
+
+</mapper>

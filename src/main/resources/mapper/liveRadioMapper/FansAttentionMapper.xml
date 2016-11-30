@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.huashitu.mapper.FansAttentionMapper" >
+  <resultMap id="BaseResultMap" type="com.huashitu.domain.FansAttention" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+      <id column="id" jdbcType="INTEGER" javaType="java.lang.Integer" property="id"/>
+      <id column="from_user" jdbcType="BIGINT" javaType="java.lang.Long" property="fromUser"/>
+      <id column="to_user" jdbcType="BIGINT" javaType="java.lang.Long" property="toUser"/>
+      <id column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" property="createTime"/>
+      <id column="relation" jdbcType="INTEGER" javaType="java.lang.Integer" property="relation"/>
+  </resultMap>
+  <sql id="base_colum">
+    id，from_user,to_user,create_time,relation
+  </sql>
+
+  <select id="selectIdolByUserId" parameterType="java.lang.Long" resultType="com.huashitu.domain.User">
+    SELECT account,name,head_pic_id FROM  user WHERE id in(SELECT to_user FROM fans_attention where from_user = #{fromUser})
+  </select>
+
+
+
+
+</mapper>

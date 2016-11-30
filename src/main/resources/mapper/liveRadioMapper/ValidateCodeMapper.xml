@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huashitu.mapper.ValidateCodeMapper">
+  <resultMap id="BaseResultMap" type="com.huashitu.domain.ValidateCode">
+    <!--
+      WARNING - @mbggenerated
+    -->
+      <id column="id" javaType="java.lang.Long" jdbcType="BIGINT" property="id"/>
+      <id column="code" javaType="java.lang.String" jdbcType="VARCHAR" property="code"/>
+      <id column="phone" javaType="java.lang.String" jdbcType="VARCHAR" property="phone"/>
+      <id column="create_time" javaType="java.util.Date" jdbcType="TIMESTAMP" property="createTime"/>
+      <id column="delete_flag" javaType="java.lang.Integer" jdbcType="INTEGER" property="deleteFlag"/>
+  </resultMap>
+  <sql id="base_colum">
+    id,code,phone,create_time,delete_flag
+  </sql>
+
+</mapper>

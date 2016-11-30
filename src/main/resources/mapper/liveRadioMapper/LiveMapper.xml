@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.huashitu.mapper.LiveMapper" >
+  <resultMap id="BaseResultMap" type="com.huashitu.domain.Live" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+      <id column="id" jdbcType="BIGINT" javaType="java.lang.Long" property="id"/>
+      <id column="anchor_id" jdbcType="BIGINT" javaType="java.lang.Long" property="anchorId"/>
+      <id column="title" jdbcType="VARCHAR" javaType="java.lang.String" property="title"/>
+      <id column="begin_time" jdbcType="TIMESTAMP" javaType="java.util.Date" property="beginTime"/>
+      <id column="end_time" jdbcType="TIMESTAMP" javaType="java.util.Date" property="endTime"/>
+      <id column="audience_conut" jdbcType="INTEGER" javaType="java.lang.Integer" property="audienceConut"/>
+      <id column="cover_pic_id" jdbcType="BIGINT" javaType="java.lang.Long" property="coverPicId"/>
+      <id column="online_status" jdbcType="INTEGER" javaType="java.lang.Integer" property="onlineStatus"/>
+      <id column="geo_location" jdbcType="VARCHAR" javaType="java.lang.String" property="geoLocation"/>
+      <id column="lon" jdbcType="DECIMAL" javaType="java.lang.Double" property="lon"/>
+      <id column="lat" jdbcType="DECIMAL" javaType="java.lang.Double" property="lat"/>
+  </resultMap>
+  <sql id="base_colum">
+    id,anchor_id,title,begin_time,end_time,audience_conut,cover_pic_id,online_status,geo_location,lon,lat
+  </sql>
+  <select id="selectOnlineLive" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    SELECT
+    <include refid="base_colum"></include>
+    FROM live
+    WHERE online_status=#{onlineStatus}
+  </select>
+
+
+
+</mapper>
